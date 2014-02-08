@@ -25,15 +25,10 @@ Posts a message. For now, the `username` doesn't actually have to match an extan
 Returns a JSON like `{"success": true}`
 
 
-### `/stoneapi/upvote/:id`
-Upvotes a message.
+### `/stoneapi/vote/:id/:amount`
+Upvotes or downvotes a message. `amount` should be either `-1` (down) or `1` (up).
 
 Returns a JSON like `{"success": true}`
-
-### `/stoneapi/downvote/:id`
-Downvotes a message.
-
-Returns JSON like `{"success" : true}`
 
 # Server setup
 

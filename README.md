@@ -12,7 +12,8 @@ When it's live, hit `[redacted].alexkersten.com`, port 3333, with the following:
 ### `/stoneapi/message/get/:lat/:lon/:radius`
 Returns a list of local message IDs, within a radius (in feet) of the user, along with the message, message rating and position.
 
-Returns a JSON like `[{"_id": "123abc456def", "message": "blah", "rating": 5.0, "lat": 44.4, "lon": 22.2, "username": "alex", uid: "213479013ae3", "private": false, "friend": true}, ...]`
+Returns a JSON like `[{"_id": "2b", "message": "blah", "rating": 5.0, "lat": 44.4, "lon": 22.2, "username": "alex"`
+`, uid: "43", "private": false, "friend": true}, ...]`
 
 ### `/stoneapi/message/post/:message/:lat/:lon/:username/:recipient`
 Posts a message. For now, the `username` doesn't actually have to match an extant user. Recipient is a UID - if 0, this is a public message.

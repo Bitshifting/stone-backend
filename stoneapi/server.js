@@ -7,7 +7,7 @@ var db = new mongo.Db('stonedb', new mongo.Server('localhost', 27017, {}), {safe
 /**
  * Get a list of message metadata within a certain radius from the user (based on provided lat/lon).
  */
-app.get('/stoneapi/get_local_metadata/:lat/:lon/:radius', function(req, res) {
+app.get('/stoneapi/message/get/:lat/:lon/:radius', function(req, res) {
 
   db.open(function() {
     db.collection('coll', function(err, collection) {
@@ -40,38 +40,14 @@ app.get('/stoneapi/get_local_metadata/:lat/:lon/:radius', function(req, res) {
 
 
 /**
- * Get specific detail about a certain message _id.
- */
-app.get('/stoneapi/get_message_content/:messageid', function(req, res) {
-  db.open(function() {
-    console.log(req.params.id);
-    db.collection('coll', function(err, collection) {
-      if (err) throw err;
-      //Find that specific message _id, and get its message, rating, lat, lon
-      collection.find({_id : new ObjectID(req.params.messageid)},  {message:1, rating:1, lat:1, lon:1, username:1}, function(err, cursor) {
-        if (err) throw err;
-        res.header("Content-Type", "application/json");
-
-        cursor.toArray(function (err, documents) {
-          if (err) throw err;
-          res.end(JSON.stringify(documents));
-          db.close();
-        });
-      });
-    });
-  });
-});
-
-
-/**
  * Posts a message at this position by a user.
  */
-app.get('/stoneapi/post_message/:message/:lat/:lon/:username', function(req, res) {
+app.get('/stoneapi/message/post/:message/:lat/:lon/:username/:recipient', function(req, res) {
 
   db.open(function() {
     db.collection('coll', function(err, collection) {
       if (err) throw err;
-      collection.insert({message: req.params.message, username: req.params.username, lat: parseFloat(req.params.lat), lon: parseFloat(req.params.lon), rating: parseFloat(1.0)}, function(err, collection) {
+      collection.insert({message: req.params.message, username: req.params.username, lat: parseFloat(req.params.lat), lon: parseFloat(req.params.lon), rating: parseFloat(0.0), recipient: new ObjectID(req.params.recipient), private: (req.params.recipient == 0? false:true)}, function(err, collection) {
         if (err) throw err;
         console.log("Inserted a message: " + req.params.message + " @ (" + req.params.lat + "," + req.params.lon + ")");
         res.header("Content-Type", "application/json");
@@ -86,12 +62,11 @@ app.get('/stoneapi/post_message/:message/:lat/:lon/:username', function(req, res
 /**
  * Updates the rating of a particular message.
  */
-app.get('/stoneapi/vote/:id/:amount/:dir', function(req, res) {
+app.get('/stoneapi/message/vote/:id/:amount/:dir', function(req, res) {
   db.open(function() {
     db.collection('coll', function(err, collection) {
       if (err) throw err;
 
-      //Get the old vote value and inc/dec it
 
   console.log("voting on record " + req.params.id + ", voting it " + req.params.amount + " units in the " + req.params.dir + " direction");
       collection.update({_id : new ObjectID(req.params.id)}, {$inc : {rating: parseFloat(req.params.dir) * parseFloat(req.params.amount)}}, function(err, count) {
@@ -105,6 +80,35 @@ app.get('/stoneapi/vote/:id/:amount/:dir', function(req, res) {
   });
 });
 
+
+/**
+ * User account creation
+ */
+/*
+app.get('/stoneapi/account/create/:firstDisplayName', function (req, res) {
+  db.open(function() {
+    db.collection('users', function(err, collection) {
+      if (err) throw err;
+      console.log("Attempting to create user " + req.params.firstDisplayName);
+
+      collection.find({username: req.params.firstDisplayName}, function(err, cursor){
+        if (err) throw err;
+
+        if (cursor.count() > 0) {
+          console.log("Username already exists...");
+          res.end('{"success": false}');
+        } else {
+          console.log("Adding user...");
+          collection.insert({username: req.params.firstDisplayName}, function(err, collection1) {
+            if (err) throw err;
+            res.end('{"success": true}');
+            db.close();
+          });
+        }
+      });
+    });
+  });
+});*/
 
 app.listen(3333);
 console.log("Listening on 3333");

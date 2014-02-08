@@ -17,7 +17,7 @@ Returns a JSON like `[{"messageID": 1, "rating": 5.0, "lat": 44.4, "lon": 22.2},
 ## `/stoneapi/get_message_content/:id`
 Returns the content of a message based on its ID.
 
-Returns a JSON like `{"message": "Look out!", "rating": 5.0, "lat": 44.4, "lon": 22.2}`
+Returns a JSON like `[{"message": "Look out!", "rating": 5.0, "lat": 44.4, "lon": 22.2}]`
 
 ## `/stoneapi/post_message/:message/:lat/:lon`
 Posts a message.

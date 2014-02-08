@@ -12,6 +12,9 @@ var app = express();
 var mongo = require('mongodb'), format = require('util').format;
 var db = new mongo.Db('stonedb', new mongo.Server('localhost', 27017, {}), {safe: true});
 
+/**
+ * Get a list of message metadata within a certain radius from the user (based on provided lat/lon).
+ */
 app.get('/stoneapi/get_local_metadata/:lat/:lon', function(req, res) {
 
   db.open(function() {
@@ -19,15 +22,13 @@ app.get('/stoneapi/get_local_metadata/:lat/:lon', function(req, res) {
       if (err) throw err;
 
       //For the local messages, we just want to project out the following:
-      // * messageID
-      // * rating
-      // * latitude
-      // * longitude
+      // messageID, rating, latitude, longitude
       collection.find({}, {messageID:1, rating:1, lat:1, lon:1}, function(err, cursor) {
         if (err) throw err;
-
         res.header("Content-Type", "application/json");
+
         cursor.toArray(function (err, documents) {
+          if (err) throw err;
           res.end(JSON.stringify(documents));
           db.close();
         });
@@ -37,8 +38,27 @@ app.get('/stoneapi/get_local_metadata/:lat/:lon', function(req, res) {
 });
 
 
+/**
+ * Get specific detail about a certain messageID.
+ */
 app.get('/stoneapi/get_message_content/:id', function(req, res) {
-  //res.send('[{"messageID": 1, "rating": 5.0, "lat": 44.4, "lon": 22.2}, {"messageID": 2, "rating": 1.0, "lat": 44.4, "lon": 22.2}, {"messageID": 3, "rating": 3.2, "lat": 44.4, "lon": 22.2}]');
+  db.open(function() {
+    db.collection('coll', function(err, collection) {
+      if (err) throw err;
+      console.log(req.params.id);
+      //Find that specific messageID, and get its message, rating, lat, lon
+      collection.find({messageID: req.params.id}, {messageID: 1, message:1, rating:1, lat:1, lon:1}, function(err, cursor) {
+        if (err) throw err;
+        res.header("Content-Type", "application/json");
+
+        cursor.toArray(function (err, documents) {
+          if (err) throw err;
+          res.end(JSON.stringify(documents));
+          db.close();
+        });
+      });
+    });
+  });
 });
 
 function getNextMessageID() {

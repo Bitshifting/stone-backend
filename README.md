@@ -24,6 +24,13 @@ Posts a message. For now, the `username` doesn't actually have to match an extan
 
 Returns a JSON like `{"success": true}`
 
+
+### `/stoneapi/upvote/:id`
+Upvotes a message.
+
+Returns a JSON like `{"success": true}`
+
+
 # Server setup
 
 * Run `node stoneapi/server.js`

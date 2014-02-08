@@ -71,7 +71,7 @@ app.get('/stoneapi/post_message/:message/:lat/:lon/:username', function(req, res
   db.open(function() {
     db.collection('coll', function(err, collection) {
       if (err) throw err;
-      collection.insert({message: req.params.message, username: req.parms.username, lat: parseFloat(req.params.lat), lon: parseFloat(req.params.lon), rating: parseFloat(1.0)}, function(err, collection) {
+      collection.insert({message: req.params.message, username: req.params.username, lat: parseFloat(req.params.lat), lon: parseFloat(req.params.lon), rating: parseFloat(1.0)}, function(err, collection) {
         if (err) throw err;
         console.log("Inserted a message: " + req.params.message + " @ (" + req.params.lat + "," + req.params.lon + ")");
         res.header("Content-Type", "application/json");

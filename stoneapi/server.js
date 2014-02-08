@@ -24,7 +24,7 @@ app.get('/stoneapi/message/get/:lat/:lon/:radius', function(req, res) {
 
       collection.find({ lat: {$gt: (parseFloat(req.params.lat) - latTolerance), $lt: (parseFloat(req.params.lat) + latTolerance)},
                        lon: {$gt: (parseFloat(req.params.lon) - lonTolerance), $lt: (parseFloat(req.params.lon) + lonTolerance)}},
-                      {_id:1, message:1, rating:1, lat:1, lon:1, username: 1}, function(err, cursor) {
+                      {_id:1, message:1, rating:1, lat:1, lon:1, username: 1, uid: 1, private: 1}, function(err, cursor) {
                         if (err) throw err;
                         res.header("Content-Type", "application/json");
 
@@ -47,7 +47,7 @@ app.get('/stoneapi/message/post/:message/:lat/:lon/:username/:recipient', functi
   db.open(function() {
     db.collection('coll', function(err, collection) {
       if (err) throw err;
-      collection.insert({message: req.params.message, username: req.params.username, lat: parseFloat(req.params.lat), lon: parseFloat(req.params.lon), rating: parseFloat(0.0), recipient: new ObjectID(req.params.recipient), private: (req.params.recipient == 0? false:true)}, function(err, collection) {
+      collection.insert({message: req.params.message, username: req.params.username, lat: parseFloat(req.params.lat), lon: parseFloat(req.params.lon), rating: parseFloat(0.0), recipient: req.params.recipient, private: (req.params.recipient == "public" ? false:true)}, function(err, collection) {
         if (err) throw err;
         console.log("Inserted a message: " + req.params.message + " @ (" + req.params.lat + "," + req.params.lon + ")");
         res.header("Content-Type", "application/json");
@@ -80,6 +80,32 @@ app.get('/stoneapi/message/vote/:id/:amount/:dir', function(req, res) {
   });
 });
 
+
+app.get('/stoneapi/account/create/:firstDisplayName', function(req, res) {
+  db.open(function() {
+    db.collection('users', function(err, collection) {
+      if (err) throw err;
+      console.log("Attempt to create user " + req.params.firstDisplayName);
+
+      collection.find({username: req.params.firstDisplayName}, function(err, cursor) {
+        if (err) throw err;
+
+        if (cursor.count > 0) {
+          console.log("Username already claimed.");
+          res.end('{"success": false}');
+          db.close();
+        } else {
+          console.log("Adding user.");
+          collection.insert({username: req.params.firstDisplayName}, function (err, collection1) {
+            if (err) throw err;
+            res.end('{"success": true})');
+            db.close();
+          });
+        }
+      });
+    });
+  });
+});
 
 /**
  * User account creation

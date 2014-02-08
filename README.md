@@ -10,12 +10,12 @@ Imitation is the greatest form of flattery
 When it's live, hit `[redacted].alexkersten.com`, port 3333, with the following:
 
 ### `/stoneapi/get_local_metadata/:lat/:lon/:radius`
-Returns a list of local message IDs, within a radius (in feet) of the user, along with the message rating and position.
+Returns a list of local message IDs, within a radius (in feet) of the user, along with the message, message rating and position.
 
-Returns a JSON like `[{"_id": "123abc456def", "rating": 5.0, "lat": 44.4, "lon": 22.2, "username": "alex"}, {"_id": "123abc456dff", "rating": 1.0, "lat": 44.4, "lon": 22.2, "username": "alex <3"}, {"_id": "123abc456fff", "rating": 3.2, "lat": 44.4, "lon": 22.2, "username": "alex <3<3"}]`
+Returns a JSON like `[{"_id": "123abc456def", "message": "blah", "rating": 5.0, "lat": 44.4, "lon": 22.2, "username": "alex"}, {"_id": "123abc456dff", "message": "blah", "rating": 1.0, "lat": 44.4, "lon": 22.2, "username": "alex <3"}, {"_id": "123abc456fff", "message": "blah", "rating": 3.2, "lat": 44.4, "lon": 22.2, "username": "alex <3<3"}]`
 
 ### `/stoneapi/get_message_content/:id`
-Returns the content of a message based on its ID.
+Returns the content of a message based on its ID. Don't have to use this, could do it all at once with the `get_local_metadata` API call.
 
 Returns a JSON like `[{"message": "Look out!", "rating": 5.0, "lat": 44.4, "lon": 22.2, "username": "alex <3"}]`
 

@@ -24,7 +24,7 @@ app.get('/stoneapi/get_local_metadata/:lat/:lon/:radius', function(req, res) {
 
       collection.find({ lat: {$gt: (parseFloat(req.params.lat) - latTolerance), $lt: (parseFloat(req.params.lat) + latTolerance)},
                        lon: {$gt: (parseFloat(req.params.lon) - lonTolerance), $lt: (parseFloat(req.params.lon) + lonTolerance)}},
-                      {_id:1, rating:1, lat:1, lon:1, username: 1}, function(err, cursor) {
+                      {_id:1, message:1, rating:1, lat:1, lon:1, username: 1}, function(err, cursor) {
                         if (err) throw err;
                         res.header("Content-Type", "application/json");
 

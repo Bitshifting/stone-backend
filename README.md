@@ -19,7 +19,7 @@ Message posting is primarily username based, so don't worry about UID for that. 
 Returns a list of local message IDs, within a radius (in feet) of the user, along with the message, message rating and position.
 
 Returns a JSON like `[{"_id": "16'hxx", "message": "blah", "rating": 5.0, "lat": 44.4, "lon": 22.2, "username": "alex"`
-`, uid: "16'hxx", "private": false}, ...]`
+`, "recipient": "public", "private": false}, ...]`
 
 ### `/stoneapi/message/post/:message/:lat/:lon/:username`
 ### `/:recipient`
@@ -45,7 +45,7 @@ Returns a JSON like `{"success": true}`
 ### `stoneapi/account/lookup/:displayName`
 Use this to get the UID of another person in order to follow them. Returns the UID of the account which goes by `displayName` - your app should keep track of this locally, in case the displayName changes - when showing message pins, maybe highlight the ones from followed UIDs in a different color?
 
-Returns a JSON like `{"uid": 8234eab83292}`
+Returns a JSON like `[{"username":, "whatever", "_id": "8234eab83292"}]`
 
 ### `stoneapi/account/addfriend/:uid/:displayName`
 Adds user who goes by `displayName` to `uid`'s friends list.
@@ -60,7 +60,7 @@ Returns a JSON like `{"success": false}`
 ### `stoneapi/account/getfriends/:uid`
 Gets a list of friend display names and UIDs for `uid`.
 
-Returns a JSON like `[{username: "Abc", uid: "572374bea"}, {username: "Bcd", uid: "74744747bb"}]`
+Returns a JSON like `[{username: "Abc", _id: "572374bea"}, {username: "Bcd", _id: "74744747bb"}]`
 
 # Server setup
 

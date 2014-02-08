@@ -30,6 +30,21 @@ Upvotes or downvotes a message. `amount` should be a magnitude, `dir` should be 
 
 Returns a JSON like `{"success": true}`
 
+### `/stoneapi/account/create/:firstDisplayName`
+Assigns a new uid to you - you should keep track of this in your app and tag all of your API requests with it...
+
+Returns a JSON like `{"uid": 987adc765bab3}`
+
+### `/stoneapi/account/update/:displayName`
+Changes account properties - like updating a display name when a user changes it, so that other users can search by display name.
+
+Returns a JSON like `{"success": true}`
+
+### `stoneapi/account/lookup/:displayName`
+Use this to get the UID of another person in order to follow them. Returns the UID of the account which goes by `displayName` - your app should keep track of this locally, in case the displayName changes - when showing message pins, maybe highlight the ones from followed UIDs in a different color?
+
+Returns a JSON like `{"uid": 8234eab83292}`
+
 # Server setup
 
 * Run `node stoneapi/server.js`

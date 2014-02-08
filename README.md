@@ -9,6 +9,12 @@ Imitation is the greatest form of flattery
 #api
 When it's live, hit `[redacted].alexkersten.com`, port 3333, with the following:
 
+## How to use
+
+Create an account with `account/create`, look up your UID with `account/lookup` and keep track of it locally, then you can invoke `account/addfriend` or `account/delfriend`.
+
+Message posting is primarily username based, so don't worry about UID for that. (Yet.)
+
 ### `/stoneapi/message/get/:lat/:lon/:radius`
 Returns a list of local message IDs, within a radius (in feet) of the user, along with the message, message rating and position.
 

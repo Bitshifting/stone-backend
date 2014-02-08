@@ -17,7 +17,7 @@ Returns a JSON like `[{"_id": "2b", "message": "blah", "rating": 5.0, "lat": 44.
 
 ### `/stoneapi/message/post/:message/:lat/:lon/:username`
 ### `/:recipient`
-Posts a message. For now, the `username` doesn't actually have to match an extant user. Recipient is a username - if blank, this is a public message.
+Posts a message. For now, the `username` doesn't actually have to match an extant user. Recipient is a username - if `public`, this is a public message.
 
 Returns a JSON like `{"success": true}`
 

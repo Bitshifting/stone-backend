@@ -20,7 +20,7 @@ Message is a JSON like `{messageID: 1337}`
 
 Returns a JSON like `{message: "Look out!"}`
 
-## `/stone/post_message(message)
+## `/stone/post_message(message)`
 Posts a message.
 
 Message is a JSON `{message: "Try Jumping", lat: "69.0", lon: "123.4"}`

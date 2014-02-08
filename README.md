@@ -7,23 +7,17 @@ Backend for the stone system, using node and express.js
 #api
 When it's live, hit `[redacted].alexkersten.com`, port 3333, with the following:
 
-## `/stoneapi/api/get_local_metadata`
+## `/stoneapi/api/get_local_metadata/:lat/:lon`
 Returns a list of local message IDs, within a radius (100m) of the user, along with the message rating and position.
-
-Send a JSON like `{"lat": 69.0, "lon": 420.0}`
 
 Returns a JSON like `[{"messageID": 1, "rating": 5.0, "lat": 44.4, "lon": 22.2}, {"messageID": 2, "rating": 1.0, "lat": 44.4, "lon": 22.2}, {"messageID": 3, "rating": 3.2, "lat": 44.4, "lon": 22.2}]`
 
-## `/stoneapi/get_message_content`
+## `/stoneapi/get_message_content/:id`
 Returns the content of a message based on its ID.
-
-Send a JSON like `{"messageID": 1337}`
 
 Returns a JSON like `{"message": "Look out!", "rating": 5.0, "lat": 44.4, "lon": 22.2}`
 
-## `/stoneapi/post_message`
+## `/stoneapi/post_message/:message/:lat/:lon`
 Posts a message.
-
-Send a JSON like `{"message": "Try Jumping", "lat": 69.0, "lon": 123.4}`
 
 Returns a JSON like `{"success": true}`

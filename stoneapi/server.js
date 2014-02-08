@@ -93,8 +93,9 @@ app.get('/stoneapi/vote/:id/:amount/:dir', function(req, res) {
 
       //Get the old vote value and inc/dec it
 
-
+  console.log("voting on record " + req.params.id + ", voting it " + req.params.amount + " units in the " + req.params.dir + " direction");
       collection.update({_id : new ObjectID(req.params.id)}, {$inc : {rating: parseFloat(req.params.dir) * parseFloat(req.params.amount)}}, function(err, count) {
+          console.log("voting success");
         res.end('{"success": true}');
         db.close();
       });

@@ -1,15 +1,7 @@
-/*var http = require('http');
-http.createServer(function(req, res) {
-  res.writeHead(200, {'Content-Type': 'text/html'});
-  res.end('<a href="https://github.com/akersten/stone-backend">See usage.</a>\n');
-                  }).listen(3333, '127.0.0.1');
-console.log("Try connecting.");
-*/
-
 var express = require('express');
 var app = express();
 
-var mongo = require('mongodb'), format = require('util').format;
+var mongo = require('mongodb'), format = require('util').format, ObjectID = require('mongodb').ObjectID;
 var db = new mongo.Db('stonedb', new mongo.Server('localhost', 27017, {}), {safe: true});
 
 /**
@@ -22,8 +14,8 @@ app.get('/stoneapi/get_local_metadata/:lat/:lon', function(req, res) {
       if (err) throw err;
 
       //For the local messages, we just want to project out the following:
-      // messageID, rating, latitude, longitude
-      collection.find({}, {messageID:1, rating:1, lat:1, lon:1}, function(err, cursor) {
+      // message _id, rating, latitude, longitude
+      collection.find({}, {_id:1, rating:1, lat:1, lon:1}, function(err, cursor) {
         if (err) throw err;
         res.header("Content-Type", "application/json");
 
@@ -39,15 +31,15 @@ app.get('/stoneapi/get_local_metadata/:lat/:lon', function(req, res) {
 
 
 /**
- * Get specific detail about a certain messageID.
+ * Get specific detail about a certain message _id.
  */
-app.get('/stoneapi/get_message_content/:id', function(req, res) {
+app.get('/stoneapi/get_message_content/:messageid', function(req, res) {
   db.open(function() {
+    console.log(req.params.id);
     db.collection('coll', function(err, collection) {
       if (err) throw err;
-      console.log(req.params.id);
-      //Find that specific messageID, and get its message, rating, lat, lon
-      collection.find({messageID: req.params.id}, {messageID: 1, message:1, rating:1, lat:1, lon:1}, function(err, cursor) {
+      //Find that specific message _id, and get its message, rating, lat, lon
+      collection.find({_id : new ObjectID(req.params.messageid)},  {message:1, rating:1, lat:1, lon:1}, function(err, cursor) {
         if (err) throw err;
         res.header("Content-Type", "application/json");
 
@@ -61,16 +53,14 @@ app.get('/stoneapi/get_message_content/:id', function(req, res) {
   });
 });
 
-function getNextMessageID() {
-  return 6969;
-}
+
 
 app.get('/stoneapi/post_message/:message/:lat/:lon', function(req, res) {
-  //res.send('[{"messageID": 1, "rating": 5.0, "lat": 44.4, "lon": 22.2}, {"messageID": 2, "rating": 1.0, "lat": 44.4, "lon": 22.2}, {"messageID": 3, "rating": 3.2, "lat": 44.4, "lon": 22.2}]');
+
   db.open(function() {
     db.collection('coll', function(err, collection) {
       if (err) throw err;
-      collection.insert({messageID: getNextMessageID(), message: req.params.message, lat: req.params.lat, lon: req.params.lon, rating: "it\'s shit!"}, function(err, collection) {
+      collection.insert({message: req.params.message, lat: req.params.lat, lon: req.params.lon, rating: "it\'s shit!"}, function(err, collection) {
         if (err) throw err;
         console.log("Inserted a message: " + req.params.message + " @ (" + req.params.lat + "," + req.params.lon + ")");
         res.header("Content-Type", "application/json");

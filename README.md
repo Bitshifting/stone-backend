@@ -11,7 +11,7 @@ When it's live, hit `[redacted].alexkersten.com`, port 3333, with the following:
 
 ## How to use
 
-Create an account with `account/create`, look up your UID with `account/lookup` and keep track of it locally, then you can invoke `account/addfriend` or `account/delfriend`.
+Create an account with `account/create`, look up your UID with `account/lookup` and keep track of it locally, then you can invoke `account/addfriend`, `account/delfriend`, or even `account/getfriends`.
 
 Message posting is primarily username based, so don't worry about UID for that. (Yet.)
 

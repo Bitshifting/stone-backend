@@ -86,18 +86,20 @@ app.get('/stoneapi/post_message/:message/:lat/:lon/:username', function(req, res
 /**
  * Updates the rating of a particular message.
  */
-app.get('/stoneapi/vote/:id/:amount', function(req, res) {
+app.get('/stoneapi/vote/:id/:amount/:dir', function(req, res) {
   db.open(function() {
     db.collection('coll', function(err, collection) {
       if (err) throw err;
 
       //Get the old vote value and inc/dec it
-      collection.findOne({id_ : new ObjectID(req.params.id)}, {rating:1}, function(err, document) {
-        collection.update({_id : new ObjectID(req.params.id)}, {rating: document.rating + parseFloat(req.params.amount)}, function(err, count) {
-          res.end('{"success": true}');
-          db.close();
-        });
+
+
+      collection.update({_id : new ObjectID(req.params.id)}, {$inc : {rating: parseFloat(req.params.dir) * parseFloat(req.params.amount)}}, function(err, count) {
+        res.end('{"success": true}');
+        db.close();
       });
+
+
     });
   });
 });

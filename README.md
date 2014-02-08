@@ -25,8 +25,8 @@ Posts a message. For now, the `username` doesn't actually have to match an extan
 Returns a JSON like `{"success": true}`
 
 
-### `/stoneapi/vote/:id/:amount`
-Upvotes or downvotes a message. `amount` should be either `-1` (down) or `1` (up).
+### `/stoneapi/vote/:id/:amount/:dir`
+Upvotes or downvotes a message. `amount` should be a magnitude, `dir` should be `-1` or `1`
 
 Returns a JSON like `{"success": true}`
 

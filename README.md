@@ -23,3 +23,16 @@ Returns a JSON like `{"message": "Look out!", "rating": 5.0, "lat": 44.4, "lon":
 Posts a message.
 
 Returns a JSON like `{"success": true}`
+
+
+# Server setup
+
+* Run `node stoneapi/server.js`
+
+The mongodb database is running in auth mode with no users, so only localhost has access.
+
+# Deps
+
+* node
+* express
+* mongodb (and node package `mongodb`)

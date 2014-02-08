@@ -1,7 +1,9 @@
 stone-backend
 =============
 
-Backend for the stone system, using node and express.js
+Backend for the stone system, using node.js, express.js, and mongoDB
+
+Imitation is the greatest form of flattery
 
 
 #api

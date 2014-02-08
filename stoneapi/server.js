@@ -7,7 +7,7 @@ var db = new mongo.Db('stonedb', new mongo.Server('localhost', 27017, {}), {safe
 /**
  * Get a list of message metadata within a certain radius from the user (based on provided lat/lon).
  */
-app.get('/stoneapi/get_local_metadata/:lat/:lon', function(req, res) {
+app.get('/stoneapi/get_local_metadata/:lat/:lon/:radius', function(req, res) {
 
   db.open(function() {
     db.collection('coll', function(err, collection) {
@@ -15,16 +15,25 @@ app.get('/stoneapi/get_local_metadata/:lat/:lon', function(req, res) {
 
       //For the local messages, we just want to project out the following:
       // message _id, rating, latitude, longitude
-      collection.find({}, {_id:1, rating:1, lat:1, lon:1}, function(err, cursor) {
-        if (err) throw err;
-        res.header("Content-Type", "application/json");
 
-        cursor.toArray(function (err, documents) {
-          if (err) throw err;
-          res.end(JSON.stringify(documents));
-          db.close();
-        });
-      });
+      //Need to find upper and lower latitude/longitude bounds, go out about one second
+      //in each direction... See http://en.wikipedia.org/wiki/Great-circle_distance
+      var latTolerance = 0.0003 * radius / 100.0 * Math.cos(parseFloat(req.params.lon)); //Normalize latitude distance to about 100 feet
+      var lonTolerance = 0.0003 * radius / 100.0;
+      console.log("Selecting from (" + req.params.lat + "," + req.params.lon + ") with tolerance lat: " + latTolerance + " , lon: " + lonTolerance);
+
+      collection.find({ lat: {$gt: (parseFloat(req.params.lat) - latTolerance), $lt: (parseFloat(req.params.lat) + latTolerance)},
+                       lon: {$gt: (parseFloat(req.params.lon) - lonTolerance), $lt: (parseFloat(req.params.lon) + lonTolerance)}},
+                      {_id:1, rating:1, lat:1, lon:1, username: 1}, function(err, cursor) {
+                        if (err) throw err;
+                        res.header("Content-Type", "application/json");
+
+                        cursor.toArray(function (err, documents) {
+                          if (err) throw err;
+                          res.end(JSON.stringify(documents));
+                          db.close();
+                        });
+                      });
     });
   });
 });
@@ -39,7 +48,7 @@ app.get('/stoneapi/get_message_content/:messageid', function(req, res) {
     db.collection('coll', function(err, collection) {
       if (err) throw err;
       //Find that specific message _id, and get its message, rating, lat, lon
-      collection.find({_id : new ObjectID(req.params.messageid)},  {message:1, rating:1, lat:1, lon:1}, function(err, cursor) {
+      collection.find({_id : new ObjectID(req.params.messageid)},  {message:1, rating:1, lat:1, lon:1, username:1}, function(err, cursor) {
         if (err) throw err;
         res.header("Content-Type", "application/json");
 
@@ -55,12 +64,12 @@ app.get('/stoneapi/get_message_content/:messageid', function(req, res) {
 
 
 
-app.get('/stoneapi/post_message/:message/:lat/:lon', function(req, res) {
+app.get('/stoneapi/post_message/:message/:lat/:lon/:username', function(req, res) {
 
   db.open(function() {
     db.collection('coll', function(err, collection) {
       if (err) throw err;
-      collection.insert({message: req.params.message, lat: req.params.lat, lon: req.params.lon, rating: "it\'s shit!"}, function(err, collection) {
+      collection.insert({message: req.params.message, username: req.parms.username, lat: parseFloat(req.params.lat), lon: parseFloat(req.params.lon), rating: "it\'s shit!"}, function(err, collection) {
         if (err) throw err;
         console.log("Inserted a message: " + req.params.message + " @ (" + req.params.lat + "," + req.params.lon + ")");
         res.header("Content-Type", "application/json");

@@ -9,8 +9,8 @@ Imitation is the greatest form of flattery
 #api
 When it's live, hit `[redacted].alexkersten.com`, port 3333, with the following:
 
-## `/stoneapi/api/get_local_metadata/:lat/:lon`
-Returns a list of local message IDs, within a radius (100m) of the user, along with the message rating and position.
+## `/stoneapi/api/get_local_metadata/:lat/:lon/:radius`
+Returns a list of local message IDs, within a radius (in feet) of the user, along with the message rating and position.
 
 Returns a JSON like `[{"_id": "123abc456def", "rating": 5.0, "lat": 44.4, "lon": 22.2, "username": "alex"}, {"_id": "123abc456dff", "rating": 1.0, "lat": 44.4, "lon": 22.2, "username": "alex <3"}, {"_id": "123abc456fff", "rating": 3.2, "lat": 44.4, "lon": 22.2, "username": "alex <3<3"}]`
 

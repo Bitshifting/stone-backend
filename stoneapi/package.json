@@ -1,0 +1,9 @@
+{
+  "name": "stone-api",
+  "description": "API for the Stone app",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "3.x"
+  }
+}

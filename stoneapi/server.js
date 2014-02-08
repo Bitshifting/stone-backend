@@ -81,30 +81,22 @@ app.get('/stoneapi/message/vote/:id/:amount/:dir', function(req, res) {
 });
 
 
+/**
+ * User account creation
+ */
 app.get('/stoneapi/account/create/:firstDisplayName', function(req, res) {
   db.open(function() {
     db.collection('users', function(err, collection) {
       if (err) throw err;
       console.log("Attempt to create user " + req.params.firstDisplayName);
 
-      collection.find({username: req.params.firstDisplayName}, function(err, cursor) {
+      collection.find({username: req.params.firstDisplayName}, {_id: 1}, function(err, cursor) {
         if (err) throw err;
 
-        cursor.count(false, function(err, count) {
+        cursor.toArray(function (err, documents) {
           if (err) throw err;
-
-          if (count > 0) {
-            console.log("Username already claimed.");
-            res.end('{"success": false}');
-            db.close();
-          } else {
-            console.log("Adding user.");
-            collection.insert({username: req.params.firstDisplayName}, function (err, collection1) {
-              if (err) throw err;
-              res.end('{"success": true}');
-              db.close();
-            });
-          }
+          res.end(JSON.stringify(documents));
+          db.close();
         });
       });
     });
@@ -112,33 +104,57 @@ app.get('/stoneapi/account/create/:firstDisplayName', function(req, res) {
 });
 
 /**
- * User account creation
+ * Changing display name
  */
-/*
-app.get('/stoneapi/account/create/:firstDisplayName', function (req, res) {
+app.get('/stoneapi/account/update/:uid/:displayName', function (req, res) {
   db.open(function() {
     db.collection('users', function(err, collection) {
       if (err) throw err;
-      console.log("Attempting to create user " + req.params.firstDisplayName);
+      console.log("Attempt changing username for uid " + req.params.uid + " to " + req.params.displayName);
 
-      collection.find({username: req.params.firstDisplayName}, function(err, cursor){
+      //Check if it already exists...
+      collection.find({username: req.params.displayName}, function(err, cursor) {
         if (err) throw err;
 
-        if (cursor.count() > 0) {
-          console.log("Username already exists...");
-          res.end('{"success": false}');
-        } else {
-          console.log("Adding user...");
-          collection.insert({username: req.params.firstDisplayName}, function(err, collection1) {
-            if (err) throw err;
-            res.end('{"success": true}');
+        cursor.count(false, function(err, count) {
+          if (err) throw err;
+
+          if (count > 0) {
+            console.log("Username in use.");
+            res.end('{"success": false}');
             db.close();
-          });
-        }
+          } else {
+            console.log("Name changed.");
+             collection.update({_id : new ObjectID(req.params.id)}, {$set : {username: req.params.displayName}}, function(err, count) {
+               if (err) throw err;
+               res.end('{"success": true}');
+               db.close();
+             });
+          }
+        });
+      });
+    })
+  });
+});
+
+/**
+ * Display name to UID lookup
+ */
+app.get('/stoneapi/account/lookup/:displayName', function (req, res) {
+  db.open(function() {
+    db.collection('users', function(err, collection) {
+      if (err) throw err;
+      collection.find({username: req.params.displayName}, function(err, cursor) {
+         if (err) throw err;
+
+        cursor.count(false, function(err, count) {
+          if (count > 0) {
+          }
+        });
       });
     });
   });
-});*/
+});
 
 app.listen(3333);
 console.log("Listening on 3333");

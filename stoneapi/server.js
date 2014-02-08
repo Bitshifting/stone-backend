@@ -17,36 +17,23 @@ app.get('/stoneapi/get_local_metadata/:lat/:lon', function(req, res) {
   db.open(function() {
     db.collection('coll', function(err, collection) {
       if (err) throw err;
-      collection.find({}, function(err, cursor) {
-        console.log("setting header...");
+
+      //For the local messages, we just want to project out the following:
+      // * messageID
+      // * rating
+      // * latitude
+      // * longitude
+      collection.find({}, {messageID:1, rating:1, lat:1, lon:1}, function(err, cursor) {
+        if (err) throw err;
+
         res.header("Content-Type", "application/json");
-        console.log("doing for-each");
-        var jsonstr = '[';
-        cursor.each(function(err, doc) {
-
-          if (doc != null) {
-             jsonstr +=
-              '{' +
-              '"messageID":' + doc.messageID +
-              '"lat":' + doc.lat +
-              '"lon":' + doc.lon +
-              '},';
-
-
-          } else {
-            res.end(jsonstr + ']');
-
+        cursor.toArray(function (err, documents) {
+          res.end(JSON.stringify(documents));
           db.close();
-
-          } /*
-                   console.log(doc);
-          }*/
         });
-
       });
     });
   });
-  //res.send('[{"messageID": 1, "rating": 5.0, "lat": 44.4, "lon": 22.2}, {"messageID": 2, "rating": 1.0, "lat": 44.4, "lon": 22.2}, {"messageID": 3, "rating": 3.2, "lat": 44.4, "lon": 22.2}]');
 });
 
 

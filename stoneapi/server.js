@@ -18,7 +18,7 @@ app.get('/stoneapi/message/get/:lat/:lon/:radius', function(req, res) {
 
       //Need to find upper and lower latitude/longitude bounds, go out about one second
       //in each direction... See http://en.wikipedia.org/wiki/Great-circle_distance
-      var latTolerance = 0.0003 * req.params.radius / 100.0 * Math.cos(parseFloat(req.params.lon) * (180/Math.pi)); //Normalize latitude distance to about 100 feet
+      var latTolerance = 0.0003 * req.params.radius / 100.0 * Math.cos(parseFloat(req.params.lon) * (180/Math.PI)); //Normalize latitude distance to about 100 feet
       var lonTolerance = 0.0003 * req.params.radius / 100.0;
       console.log("Selecting from (" + req.params.lat + "," + req.params.lon + ") with tolerance lat: " + latTolerance + " , lon: " + lonTolerance);
 
@@ -93,10 +93,21 @@ app.get('/stoneapi/account/create/:firstDisplayName', function(req, res) {
       collection.find({username: req.params.firstDisplayName}, {_id: 1}, function(err, cursor) {
         if (err) throw err;
 
-        cursor.toArray(function (err, documents) {
+        cursor.count(false, function(err, count) {
           if (err) throw err;
-          res.end(JSON.stringify(documents));
-          db.close();
+
+          if (count > 0) {
+            console.log("Username in use.");
+            res.end('{"success": false}');
+            db.close();
+          } else {
+            console.log("User added.");
+             collection.insert({username: req.params.firstDisplayName}, function(err, count) {
+               if (err) throw err;
+               res.end('{"success": true}');
+               db.close();
+             });
+          }
         });
       });
     });
@@ -147,9 +158,10 @@ app.get('/stoneapi/account/lookup/:displayName', function (req, res) {
       collection.find({username: req.params.displayName}, function(err, cursor) {
          if (err) throw err;
 
-        cursor.count(false, function(err, count) {
-          if (count > 0) {
-          }
+        cursor.toArray(function (err, documents) {
+          if (err) throw err;
+          res.end(JSON.stringify(documents));
+          db.close();
         });
       });
     });

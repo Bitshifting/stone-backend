@@ -30,6 +30,10 @@ Upvotes a message.
 
 Returns a JSON like `{"success": true}`
 
+### `/stoneapi/downvote/:id`
+Downvotes a message.
+
+Returns JSON like `{"success" : true}`
 
 # Server setup
 

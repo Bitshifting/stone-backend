@@ -18,8 +18,8 @@ app.get('/stoneapi/get_local_metadata/:lat/:lon/:radius', function(req, res) {
 
       //Need to find upper and lower latitude/longitude bounds, go out about one second
       //in each direction... See http://en.wikipedia.org/wiki/Great-circle_distance
-      var latTolerance = 0.0003 * radius / 100.0 * Math.cos(parseFloat(req.params.lon)); //Normalize latitude distance to about 100 feet
-      var lonTolerance = 0.0003 * radius / 100.0;
+      var latTolerance = 0.0003 * req.params.radius / 100.0 * Math.cos(parseFloat(req.params.lon)); //Normalize latitude distance to about 100 feet
+      var lonTolerance = 0.0003 * req.params.radius / 100.0;
       console.log("Selecting from (" + req.params.lat + "," + req.params.lon + ") with tolerance lat: " + latTolerance + " , lon: " + lonTolerance);
 
       collection.find({ lat: {$gt: (parseFloat(req.params.lat) - latTolerance), $lt: (parseFloat(req.params.lat) + latTolerance)},

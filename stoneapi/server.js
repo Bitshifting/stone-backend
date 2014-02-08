@@ -63,13 +63,15 @@ app.get('/stoneapi/get_message_content/:messageid', function(req, res) {
 });
 
 
-
+/**
+ * Posts a message at this position by a user.
+ */
 app.get('/stoneapi/post_message/:message/:lat/:lon/:username', function(req, res) {
 
   db.open(function() {
     db.collection('coll', function(err, collection) {
       if (err) throw err;
-      collection.insert({message: req.params.message, username: req.parms.username, lat: parseFloat(req.params.lat), lon: parseFloat(req.params.lon), rating: "it\'s shit!"}, function(err, collection) {
+      collection.insert({message: req.params.message, username: req.parms.username, lat: parseFloat(req.params.lat), lon: parseFloat(req.params.lon), rating: parseFloat(1.0)}, function(err, collection) {
         if (err) throw err;
         console.log("Inserted a message: " + req.params.message + " @ (" + req.params.lat + "," + req.params.lon + ")");
         res.header("Content-Type", "application/json");
@@ -79,6 +81,27 @@ app.get('/stoneapi/post_message/:message/:lat/:lon/:username', function(req, res
     });
   });
 });
+
+
+/**
+ * Updates the rating of a particular message.
+ */
+app.get('/stoneapi/vote/:id/:amount', function(req, res) {
+  db.open(function() {
+    db.collection('coll', function(err, collection) {
+      if (err) throw err;
+
+      //Get the old vote value and inc/dec it
+      collection.findOne({id_ : new ObjectID(req.params.id)}, {rating:1}, function(err, document) {
+        collection.update({_id : new ObjectID(req.params.id)}, {rating: document.rating + parseFloat(req.params.amount)}, function(err, count) {
+          res.end('{"success": true}');
+          db.close();
+        });
+      });
+    });
+  });
+});
+
 
 app.listen(3333);
 console.log("Listening on 3333");

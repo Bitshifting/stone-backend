@@ -209,6 +209,13 @@ app.get('/stoneapi/account/addfriend/:uid/:displayName', function (req, res) {
 
         cursor.toArray(function (err, documents) {
           if (err) throw err;
+          if (documents.length == 0) {
+            res.end('{"success": false}');
+            console.log("silly person tried to add a non-existant friend");
+            db.close();
+            return;
+          }
+
           console.log("Found onettttttttfffff: " + documents[0]._id);
 
 
@@ -270,12 +277,12 @@ app.get('/stoneapi/account/getfollowees/:uid', function (req, res) {
       if (err) throw err;
 
 
-      collection.find({_id: new ObjectID(req.params.uid)}, {followee: 1, followeeName: 1}, function (err, cursor) {
+      collection.find({follower: req.params.uid}, {followee: 1, followeeName: 1}, function (err, cursor) {
         if (err) throw err;
-
+              console.log("found a friendship");
         cursor.toArray(function (err, documents) {
           if (err) throw err;
-
+              console.log("friendship success with lenght " + documents.length);
 
           res.end(JSON.stringify(documents));
           db.close();

@@ -73,7 +73,3 @@ The mongodb database is running in auth mode with no users, so only localhost ha
 * node
 * express
 * mongodb (and node package `mongodb`)
-
-# Todo
-
-* api to create

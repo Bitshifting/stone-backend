@@ -57,7 +57,7 @@ Removes user who goes by `displayName` from `uid`'s friends list.
 
 Returns a JSON like `{"success": false}`
 
-### `stoneapi/account/getfriends/:uid`
+### `stoneapi/account/getfollowees/:uid`
 Gets a list of friend display names and UIDs for `uid`.
 
 Returns a JSON like `[{username: "Abc", _id: "572374bea"}, {username: "Bcd", _id: "74744747bb"}]`

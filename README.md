@@ -60,7 +60,7 @@ Returns a JSON like `{"success": false}`
 ### `stoneapi/account/getfollowees/:uid`
 Gets a list of friend display names and UIDs for `uid`.
 
-Returns a JSON like `[{username: "Abc", _id: "572374bea"}, {username: "Bcd", _id: "74744747bb"}]`
+Returns a JSON like `[{foloweeName: "Abc", folowee: "572374bea"}, {foloweeName: "Bcd", folowee: "74744747bb"}]`
 
 # Server setup
 

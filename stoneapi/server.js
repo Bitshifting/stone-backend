@@ -4,12 +4,15 @@ var app = express();
 var mongo = require('mongodb'), format = require('util').format, ObjectID = require('mongodb').ObjectID;
 var db = new mongo.Db('stonedb', new mongo.Server('localhost', 27017, {}), {safe: true});
 
+db.open(function() {
+ console.log("mongodb connection established");
+});
+
 /**
  * Get a list of message metadata within a certain radius from the user (based on provided lat/lon).
  */
 app.get('/stoneapi/message/get/:lat/:lon/:radius', function(req, res) {
 
-  db.open(function() {
     db.collection('coll', function(err, collection) {
       if (err) throw err;
 
@@ -26,16 +29,13 @@ app.get('/stoneapi/message/get/:lat/:lon/:radius', function(req, res) {
                        lon: {$gt: (parseFloat(req.params.lon) - lonTolerance), $lt: (parseFloat(req.params.lon) + lonTolerance)}},
                       {_id:1, message:1, rating:1, lat:1, lon:1, username: 1, recipient: 1, private: 1}, function(err, cursor) {
                         if (err) throw err;
-                        res.header("Content-Type", "application/json");
 
                         cursor.toArray(function (err, documents) {
                           if (err) throw err;
-                          res.end(JSON.stringify(documents));
-                          db.close();
+                          res.jsonp(JSON.stringify(documents));
                         });
                       });
     });
-  });
 });
 
 
@@ -44,18 +44,14 @@ app.get('/stoneapi/message/get/:lat/:lon/:radius', function(req, res) {
  */
 app.get('/stoneapi/message/post/:message/:lat/:lon/:username/:recipient', function(req, res) {
 
-  db.open(function() {
     db.collection('coll', function(err, collection) {
       if (err) throw err;
       collection.insert({message: req.params.message, username: req.params.username, lat: parseFloat(req.params.lat), lon: parseFloat(req.params.lon), rating: parseFloat(0.0), recipient: req.params.recipient, private: (req.params.recipient == "public" ? false:true)}, function(err, collection) {
         if (err) throw err;
         console.log("Inserted a message: " + req.params.message + " @ (" + req.params.lat + "," + req.params.lon + ")");
-        res.header("Content-Type", "application/json");
-        res.end('{"success": true}');
-        db.close();
+        res.jsonp('{"success": true}');
       });
     });
-  });
 });
 
 
@@ -63,7 +59,6 @@ app.get('/stoneapi/message/post/:message/:lat/:lon/:username/:recipient', functi
  * Updates the rating of a particular message.
  */
 app.get('/stoneapi/message/vote/:id/:amount/:dir', function(req, res) {
-  db.open(function() {
     db.collection('coll', function(err, collection) {
       if (err) throw err;
 
@@ -71,13 +66,11 @@ app.get('/stoneapi/message/vote/:id/:amount/:dir', function(req, res) {
   console.log("voting on record " + req.params.id + ", voting it " + req.params.amount + " units in the " + req.params.dir + " direction");
       collection.update({_id : new ObjectID(req.params.id)}, {$inc : {rating: parseFloat(req.params.dir) * parseFloat(req.params.amount)}}, function(err, count) {
           console.log("voting success");
-        res.end('{"success": true}');
-        db.close();
+        res.jsonp('{"success": true}');
       });
 
 
     });
-  });
 });
 
 
@@ -85,7 +78,6 @@ app.get('/stoneapi/message/vote/:id/:amount/:dir', function(req, res) {
  * User account creation
  */
 app.get('/stoneapi/account/create/:firstDisplayName', function(req, res) {
-  db.open(function() {
     db.collection('users', function(err, collection) {
       if (err) throw err;
       console.log("Attempt to create user " + req.params.firstDisplayName);
@@ -98,27 +90,23 @@ app.get('/stoneapi/account/create/:firstDisplayName', function(req, res) {
 
           if (count > 0) {
             console.log("Username in use.");
-            res.end('{"success": false}');
-            db.close();
+            res.jsonp('{"success": false}');
           } else {
             console.log("User added.");
              collection.insert({username: req.params.firstDisplayName}, function(err, count) {
                if (err) throw err;
-               res.end('{"success": true}');
-               db.close();
+               res.jsonp('{"success": true}');
              });
           }
         });
       });
     });
-  });
 });
 
 /**
  * Changing display name
  */
 app.get('/stoneapi/account/update/:uid/:displayName', function (req, res) {
-  db.open(function() {
     db.collection('users', function(err, collection) {
       if (err) throw err;
       console.log("Attempt changing username for uid " + req.params.uid + " to " + req.params.displayName);
@@ -132,20 +120,17 @@ app.get('/stoneapi/account/update/:uid/:displayName', function (req, res) {
 
           if (count > 0) {
             console.log("Username in use.");
-            res.end('{"success": false}');
-            db.close();
+            res.jsonp('{"success": false}');
           } else {
             console.log("Name changed.");
              collection.update({_id : new ObjectID(req.params.id)}, {$set : {username: req.params.displayName}}, function(err, count) {
                if (err) throw err;
-               res.end('{"success": true}');
-               db.close();
+               res.jsonp('{"success": true}');
              });
           }
         });
       });
     })
-  });
 });
 
 /**
@@ -153,7 +138,6 @@ app.get('/stoneapi/account/update/:uid/:displayName', function (req, res) {
  */
 app.get('/stoneapi/account/lookup/:displayName', function (req, res) {
   console.log("looking up " + req.params.displayName);
-    db.open(function() {
     db.collection('users', function(err, collection) {
       if (err) throw err;
       collection.find({username: req.params.displayName}, function(err, cursor) {
@@ -162,17 +146,14 @@ app.get('/stoneapi/account/lookup/:displayName', function (req, res) {
         cursor.toArray(function (err, documents) {
           if (err) throw err;
         console.log("Found one");
-          res.end(JSON.stringify(documents));
-          db.close();
+          res.jsonp(JSON.stringify(documents));
         });
       });
     });
-  });
 });
 
 function getNameFromUID(uid, callback) {
   console.log("reverse lookup on " + uid);
-  db.open(function() {
     db.collection('users', function(err, collection) {
       if (err) throw err;
       console.log("Checking id " + uid);
@@ -185,11 +166,9 @@ function getNameFromUID(uid, callback) {
           console.log("Length of documents is " + documents.length);
 
           console.log("Reverse lookup success: " + documents[0].username);
-          db.close();
           callback(documents[0].username);
         });
       });
-    });
   });
 }
 
@@ -197,11 +176,7 @@ function getNameFromUID(uid, callback) {
  * Add friend
  */
 app.get('/stoneapi/account/addfriend/:uid/:displayName', function (req, res) {
-  if (db) {
-    db.close();
-  }
   console.log("looking up " + req.params.displayName);
-  db.open(function() {
     db.collection('users', function(err, collection) {
       if (err) throw err;
       collection.find({username: req.params.displayName}, function(err, cursor) {
@@ -210,9 +185,8 @@ app.get('/stoneapi/account/addfriend/:uid/:displayName', function (req, res) {
         cursor.toArray(function (err, documents) {
           if (err) throw err;
           if (documents.length == 0) {
-            res.end('{"success": false}');
+            res.jsonp('{"success": false}');
             console.log("silly person tried to add a non-existant friend");
-            db.close();
             return;
           }
 
@@ -223,13 +197,11 @@ app.get('/stoneapi/account/addfriend/:uid/:displayName', function (req, res) {
             if (err) throw err;
             collection2.insert({follower: req.params.uid, followee: documents[0]._id, followeeName: req.params.displayName}, function(err, records) {
               console.log("friend add success");
-              res.end('{"success": true}');
-              db.close();
+              res.jsonp('{"success": true}');
             });
           });
         });
       });
-    });
   });
 });
 
@@ -238,11 +210,7 @@ app.get('/stoneapi/account/addfriend/:uid/:displayName', function (req, res) {
  * Remove friend
  */
 app.get('/stoneapi/account/delfriend/:uid/:displayName', function (req, res) {
-  if (db) {
-    db.close();
-  }
   console.log("looking up " + req.params.displayName);
-  db.open(function() {
     db.collection('users', function(err, collection) {
       if (err) throw err;
       collection.find({username: req.params.displayName}, function(err, cursor) {
@@ -257,14 +225,12 @@ app.get('/stoneapi/account/delfriend/:uid/:displayName', function (req, res) {
             if (err) throw err;
             collection2.remove({follower: req.params.uid, followee: documents[0]._id}, function(err, records) {
               console.log("friend del success");
-              res.end('{"success": true}');
-              db.close();
+              res.jsonp('{"success": true}');
             });
           });
         });
       });
     });
-  });
 });
 
 
@@ -272,7 +238,6 @@ app.get('/stoneapi/account/delfriend/:uid/:displayName', function (req, res) {
 app.get('/stoneapi/account/getfollowees/:uid', function (req, res) {
   var things;
 
-  db.open(function() {
     db.collection('friendships', function(err, collection) {
       if (err) throw err;
 
@@ -284,13 +249,11 @@ app.get('/stoneapi/account/getfollowees/:uid', function (req, res) {
           if (err) throw err;
               console.log("friendship success with lenght " + documents.length);
 
-          res.end(JSON.stringify(documents));
-          db.close();
+          res.jsonp(JSON.stringify(documents));
 
         });
       });
     });
-  });
 });
 
 
